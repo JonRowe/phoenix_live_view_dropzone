@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Main</title>
+  <style>body { padding: 0; margin: 0; }</style>
+  <script src="elm.js"></script>
+  <script src="index.js"></script>
+</head>
+<body>
+  <div id="elm">
+  </div>
+  <script>
+    var generateUrl = (id) => "http://0.0.0.0:4001/upload";
+    var onStatus = ({id, status}) => console.log("result:", id, status);
+
+    PhoenixLiveViewDropzone.setup({node: "elm", generateUrl: generateUrl, onStatusUpdate: onStatus});
+  </script>
+</body>
+</html>
