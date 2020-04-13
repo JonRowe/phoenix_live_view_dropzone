@@ -10,11 +10,12 @@ import Json.Decode as Json exposing (Value)
 import Ports
 import Task exposing (Task)
 import Upload exposing (Upload, UploadId, UploadTarget, createUpload, updateUploadProgress, uploadStatus)
+import Uploads exposing (Uploads)
 
 
 type alias Model =
     { types : List String
-    , upload : Maybe Upload
+    , uploads : Uploads
     }
 
 
@@ -43,7 +44,7 @@ filetypes =
 none : Model
 none =
     { types = filetypes
-    , upload = Nothing
+    , uploads = Uploads.empty
     }
 
 
@@ -54,12 +55,7 @@ subscriptions model =
         urlSub =
             Ports.addUploadUrl UrlGenerated
     in
-    case model.upload of
-        Just upload ->
-            Sub.batch [ urlSub, Http.track upload.id (UploadProgress upload) ]
-
-        _ ->
-            urlSub
+    Sub.batch ([ urlSub ] ++ Uploads.subscribe model.uploads UploadProgress)
 
 
 startUpload : Upload -> String -> Cmd Msg
@@ -85,9 +81,9 @@ startUpload upload url =
         }
 
 
-notifyUploadStatus : Model -> String -> Cmd Msg
-notifyUploadStatus model status =
-    case model.upload of
+notifyUploadStatus : UploadId -> Uploads -> String -> Cmd Msg
+notifyUploadStatus id uploads status =
+    case Uploads.get uploads id of
         Just upload ->
             Ports.notifyUploadStatus (uploadStatus upload status)
 
@@ -97,6 +93,20 @@ notifyUploadStatus model status =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        setUpload : Upload -> Model
+        setUpload upload =
+            { model | uploads = Uploads.update model.uploads upload }
+
+        setUploadStatus : UploadId -> String -> ( Model, Cmd Msg )
+        setUploadStatus id status =
+            let
+                newModel : Model
+                newModel =
+                    { model | uploads = Uploads.delete model.uploads id }
+            in
+            ( newModel, notifyUploadStatus id model.uploads status )
+    in
     case msg of
         OpenFileSelect ->
             ( model, Select.file model.types FileSelected )
@@ -105,10 +115,10 @@ update msg model =
             ( model, Task.perform StartUpload (createUpload file) )
 
         StartUpload upload ->
-            ( { model | upload = Just upload }, Ports.requestUrl { id = upload.id, filename = upload.name } )
+            ( setUpload upload, Ports.requestUrl { id = upload.id, filename = upload.name } )
 
         UrlGenerated target ->
-            case model.upload of
+            case Uploads.get model.uploads target.id of
                 Just upload ->
                     ( model, startUpload upload target.url )
 
@@ -121,31 +131,19 @@ update msg model =
                 updated =
                     updateUploadProgress upload progress
             in
-            ( { model | upload = Just updated }, Ports.notifyUploadStatus (uploadStatus updated "InProgress") )
+            ( setUpload updated, Ports.notifyUploadStatus (uploadStatus updated "InProgress") )
 
         Done uploadId ->
-            ( none, notifyUploadStatus model "Done" )
+            setUploadStatus uploadId "Done"
 
         Error uploadId ->
-            ( none, notifyUploadStatus model "Error" )
+            setUploadStatus uploadId "Error"
 
 
 view : Model -> Html Msg
 view model =
-    let
-        filename : Maybe Upload -> String
-        filename possibleUpload =
-            case possibleUpload of
-                Just upload ->
-                    "Filename: " ++ upload.name
-
-                _ ->
-                    "Filename: not set"
-    in
     div []
         [ button [ onClick OpenFileSelect ] [ text "Upload" ]
-        , br [] []
-        , text (filename model.upload)
         ]
 
 
