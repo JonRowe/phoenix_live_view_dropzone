@@ -9,7 +9,7 @@ import Http exposing (Progress)
 import Json.Decode as Json exposing (Value)
 import Ports
 import Task exposing (Task)
-import Upload exposing (Upload, UploadId, createUpload, updateUploadProgress, uploadStatus)
+import Upload exposing (Upload, UploadId, UploadTarget, createUpload, updateUploadProgress, uploadStatus)
 
 
 type alias Model =
@@ -22,7 +22,7 @@ type Msg
     = OpenFileSelect
     | FileSelected File
     | StartUpload Upload
-    | UrlGenerated String
+    | UrlGenerated UploadTarget
     | UploadProgress Upload Progress
     | Error UploadId
     | Done UploadId
@@ -107,10 +107,10 @@ update msg model =
         StartUpload upload ->
             ( { model | upload = Just upload }, Ports.requestUrl { id = upload.id, filename = upload.name } )
 
-        UrlGenerated url ->
+        UrlGenerated target ->
             case model.upload of
                 Just upload ->
-                    ( model, startUpload upload url )
+                    ( model, startUpload upload target.url )
 
                 _ ->
                     ( model, Cmd.none )

@@ -25,7 +25,7 @@ export class PhoenixLiveViewDropzone {
     if (dataset && this.dataId !== dataset.id && this.dataUrl !== dataset.url) {
       this.dataId = dataset.id;
       this.dataUrl = dataset.url;
-      this.app.ports.addUploadUrl.send(this.dataUrl);
+      this.app.ports.addUploadUrl.send({id: this.dataId, url: this.dataUrl});
     }
   }
 }

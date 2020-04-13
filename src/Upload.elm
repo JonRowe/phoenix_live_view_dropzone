@@ -1,4 +1,4 @@
-module Upload exposing (Upload, UploadId, UploadStatus, createUpload, updateUploadProgress, uploadStatus)
+module Upload exposing (Upload, UploadId, UploadStatus, UploadTarget, createUpload, updateUploadProgress, uploadStatus)
 
 import Bytes exposing (Bytes)
 import File exposing (File)
@@ -16,6 +16,12 @@ type alias Upload =
     , id : UploadId
     , name : String
     , progress : Int
+    }
+
+
+type alias UploadTarget =
+    { id : UploadId
+    , url : String
     }
 
 
