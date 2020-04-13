@@ -30,3 +30,6 @@ phoenix_live_view_dropzone-*.tar
 
 # This is designed as a package, ignore lockfile.
 mix.lock
+
+# Ignore parcel cache
+.cache

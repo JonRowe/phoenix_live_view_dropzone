@@ -1,6 +1,6 @@
 'use strict';
 
-import { Elm } from "./elm.js";
+import { Elm } from "./Main.elm";
 
 export class PhoenixLiveViewDropzone {
   mounted() {
@@ -22,7 +22,6 @@ export class PhoenixLiveViewDropzone {
 
   updated() {
     var dataset = this.el.dataset;
-    consolg.log(dataset)
     if (dataset && this.dataId !== dataset.id && this.dataUrl !== dataset.url) {
       this.dataId = dataset.id;
       this.dataUrl = dataset.url;
