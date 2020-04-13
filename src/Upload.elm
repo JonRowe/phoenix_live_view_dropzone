@@ -71,7 +71,7 @@ updateUploadProgress upload progress =
             let
                 percentage : Int
                 percentage =
-                    (data.sent // data.size) * 100
+                    ceiling (Http.fractionSent data) * 100
             in
             { upload | progress = percentage }
 
