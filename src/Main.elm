@@ -81,19 +81,18 @@ startUpload upload url =
         }
 
 
-notifyUploadStatus : UploadId -> Uploads -> String -> Cmd Msg
-notifyUploadStatus id uploads status =
-    case Uploads.get uploads id of
-        Just upload ->
-            Ports.notifyUploadStatus (uploadStatus upload status)
-
-        _ ->
-            Cmd.none
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     let
+        notifyUploadStatus : UploadId -> String -> Cmd Msg
+        notifyUploadStatus id status =
+            case Uploads.get model.uploads id of
+                Just upload ->
+                    Ports.notifyUploadStatus (uploadStatus upload status)
+
+                _ ->
+                    Cmd.none
+
         setUpload : Upload -> Model
         setUpload upload =
             { model | uploads = Uploads.update model.uploads upload }
@@ -105,7 +104,7 @@ update msg model =
                 newModel =
                     { model | uploads = Uploads.delete model.uploads id }
             in
-            ( newModel, notifyUploadStatus id model.uploads status )
+            ( newModel, notifyUploadStatus id status )
     in
     case msg of
         OpenFileSelect ->
