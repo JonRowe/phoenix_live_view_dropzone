@@ -1,7 +1,8 @@
-module Upload exposing (Upload, UploadStatus, createUpload, uploadStatus)
+module Upload exposing (Upload, UploadStatus, createUpload, updateUploadProgress, uploadStatus)
 
 import Bytes exposing (Bytes)
 import File exposing (File)
+import Http exposing (Progress(..))
 import SHA256 as SHA
 import Task exposing (Task)
 
@@ -10,6 +11,7 @@ type alias Upload =
     { file : File
     , id : String
     , name : String
+    , progress : Int
     }
 
 
@@ -49,9 +51,24 @@ makeUpload file id =
         filename =
             File.name file
     in
-    { file = file, id = id, name = filename }
+    { file = file, id = id, name = filename, progress = 0 }
 
 
-uploadStatus : Upload -> String -> Int -> UploadStatus
-uploadStatus upload status progress =
-    { id = upload.id, filename = upload.name, status = status, progress = progress }
+updateUploadProgress : Upload -> Progress -> Upload
+updateUploadProgress upload progress =
+    case progress of
+        Sending data ->
+            let
+                percentage : Int
+                percentage =
+                    (data.sent // data.size) * 100
+            in
+            { upload | progress = percentage }
+
+        _ ->
+            upload
+
+
+uploadStatus : Upload -> String -> UploadStatus
+uploadStatus upload status =
+    { id = upload.id, filename = upload.name, status = status, progress = upload.progress }

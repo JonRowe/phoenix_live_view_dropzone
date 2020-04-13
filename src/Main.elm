@@ -5,11 +5,11 @@ import File exposing (File)
 import File.Select as Select
 import Html exposing (Html, br, button, div, text)
 import Html.Events exposing (onClick)
-import Http
+import Http exposing (Progress)
 import Json.Decode as Json exposing (Value)
 import Ports
 import Task exposing (Task)
-import Upload exposing (Upload, createUpload, uploadStatus)
+import Upload exposing (Upload, createUpload, updateUploadProgress, uploadStatus)
 
 
 type alias Model =
@@ -23,6 +23,7 @@ type Msg
     | FileSelected File
     | StartUpload Upload
     | UrlGenerated String
+    | UploadProgress Upload Progress
     | Error Upload
     | Done Upload
 
@@ -48,7 +49,17 @@ none =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Ports.addUploadUrl UrlGenerated
+    let
+        urlSub : Sub Msg
+        urlSub =
+            Ports.addUploadUrl UrlGenerated
+    in
+    case model.upload of
+        Just upload ->
+            Sub.batch [ urlSub, Http.track upload.id (UploadProgress upload) ]
+
+        _ ->
+            urlSub
 
 
 startUpload : Upload -> String -> Cmd Msg
@@ -70,7 +81,7 @@ startUpload upload url =
         , body = Http.fileBody upload.file
         , expect = Http.expectString handleResponse
         , timeout = Nothing
-        , tracker = Nothing
+        , tracker = Just upload.id
         }
 
 
@@ -94,11 +105,19 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        UploadProgress upload progress ->
+            let
+                updated : Upload
+                updated =
+                    updateUploadProgress upload progress
+            in
+            ( { model | upload = Just updated }, Ports.notifyUploadStatus (uploadStatus updated "InProgress") )
+
         Done upload ->
-            ( none, Ports.notifyUploadStatus (uploadStatus upload "Done" 100) )
+            ( none, Ports.notifyUploadStatus (uploadStatus upload "Done") )
 
         Error upload ->
-            ( none, Ports.notifyUploadStatus (uploadStatus upload "Error" 0) )
+            ( none, Ports.notifyUploadStatus (uploadStatus upload "Error") )
 
 
 view : Model -> Html Msg
