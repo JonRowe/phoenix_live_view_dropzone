@@ -8,21 +8,21 @@ import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Json exposing (Value)
 import Ports
+import Upload exposing (Upload, createUpload, uploadStatus)
 
 
 type alias Model =
-    { file : Maybe File
-    , types : List String
-    , url : Maybe String
+    { types : List String
+    , upload : Maybe Upload
     }
 
 
 type Msg
     = OpenFileSelect
-    | StartUpload File
+    | StartUpload Upload
     | UrlGenerated String
-    | Error File Int
-    | Done File
+    | Error Upload
+    | Done Upload
 
 
 init : Value -> ( Model, Cmd Msg )
@@ -39,9 +39,8 @@ filetypes =
 
 none : Model
 none =
-    { file = Nothing
-    , types = filetypes
-    , url = Nothing
+    { types = filetypes
+    , upload = Nothing
     }
 
 
@@ -50,23 +49,23 @@ subscriptions model =
     Ports.addUploadUrl UrlGenerated
 
 
-uploadFile : File -> String -> Cmd Msg
-uploadFile file url =
+startUpload : Upload -> String -> Cmd Msg
+startUpload upload url =
     let
         handleResponse : Result Http.Error String -> Msg
         handleResponse result =
             case result of
                 Ok string ->
-                    Done file
+                    Done upload
 
                 _ ->
-                    Error file 0
+                    Error upload
     in
     Http.request
         { method = "PUT"
         , headers = []
         , url = url
-        , body = Http.fileBody file
+        , body = Http.fileBody upload.file
         , expect = Http.expectString handleResponse
         , timeout = Nothing
         , tracker = Nothing
@@ -75,64 +74,44 @@ uploadFile file url =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    let
-        uploadStatus : File -> String -> Int -> { filename : String, id : String, progress : Int, status : String }
-        uploadStatus file status progress =
-            { id = File.name file, filename = File.name file, status = status, progress = progress }
-    in
     case msg of
         OpenFileSelect ->
-            ( model, Select.file model.types StartUpload )
+            ( model, Select.file model.types (StartUpload << createUpload) )
 
-        StartUpload file ->
-            ( { model | file = Just file }, Ports.requestUrl { id = File.name file, filename = File.name file } )
+        StartUpload upload ->
+            ( { model | upload = Just upload }, Ports.requestUrl { id = upload.id, filename = upload.name } )
 
         UrlGenerated url ->
-            let
-                cmd =
-                    case model.file of
-                        Just file ->
-                            uploadFile file url
+            case model.upload of
+                Just upload ->
+                    ( model, startUpload upload url )
 
-                        _ ->
-                            Cmd.none
-            in
-            ( { model | url = Just url }, cmd )
+                _ ->
+                    ( model, Cmd.none )
 
-        Done file ->
-            ( none, Ports.notifyUploadStatus (uploadStatus file "Done" 100) )
+        Done upload ->
+            ( none, Ports.notifyUploadStatus (uploadStatus upload "Done" 100) )
 
-        Error file progress ->
-            ( none, Ports.notifyUploadStatus (uploadStatus file "Error" progress) )
+        Error upload ->
+            ( none, Ports.notifyUploadStatus (uploadStatus upload "Error" 0) )
 
 
 view : Model -> Html Msg
 view model =
     let
-        filename : Maybe File -> String
-        filename possibleFile =
-            case possibleFile of
-                Just file ->
-                    "Filename: " ++ File.name file
+        filename : Maybe Upload -> String
+        filename possibleUpload =
+            case possibleUpload of
+                Just upload ->
+                    "Filename: " ++ upload.name
 
                 _ ->
                     "Filename: not set"
-
-        url : Maybe String -> String
-        url possibleString =
-            case possibleString of
-                Just string ->
-                    "URL: " ++ string
-
-                _ ->
-                    "URL: not set"
     in
     div []
         [ button [ onClick OpenFileSelect ] [ text "Upload" ]
         , br [] []
-        , text (filename model.file)
-        , br [] []
-        , text (url model.url)
+        , text (filename model.upload)
         ]
 
 
