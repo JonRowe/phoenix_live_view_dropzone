@@ -8,6 +8,7 @@ import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Json exposing (Value)
 import Ports
+import Task exposing (Task)
 import Upload exposing (Upload, createUpload, uploadStatus)
 
 
@@ -19,6 +20,7 @@ type alias Model =
 
 type Msg
     = OpenFileSelect
+    | FileSelected File
     | StartUpload Upload
     | UrlGenerated String
     | Error Upload
@@ -76,7 +78,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         OpenFileSelect ->
-            ( model, Select.file model.types (StartUpload << createUpload) )
+            ( model, Select.file model.types FileSelected )
+
+        FileSelected file ->
+            ( model, Task.perform StartUpload (createUpload file) )
 
         StartUpload upload ->
             ( { model | upload = Just upload }, Ports.requestUrl { id = upload.id, filename = upload.name } )
