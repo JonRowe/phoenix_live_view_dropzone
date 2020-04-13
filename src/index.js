@@ -9,12 +9,12 @@ export class PhoenixLiveViewDropzone {
 
     var liveView = this;
 
-    var generateUrl = (fileId) => liveView.pushEvent("phx-dropzone-generate-file-url", fileId);
-    var onStatusUpdate = (result) => liveView.pushEvent("phx-dropzone-status", result);
+    var generateUrl = (data) => liveView.pushEvent("phx-dropzone",["generate-url", data]);
+    var statusUpdate = (data) => liveView.pushEvent("phx-dropzone", ["file-status", data]);
 
     this.app = Elm.Main.init({flags: {}, node: node});
     this.app.ports.requestUrl.subscribe(generateUrl);
-    this.app.ports.notifyUploadStatus.subscribe(onStatusUpdate);
+    this.app.ports.notifyUploadStatus.subscribe(statusUpdate);
 
     this.dataId = this.el.dataset.id;
     this.dataUrl = this.el.dataset.url;

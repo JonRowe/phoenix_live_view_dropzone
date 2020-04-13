@@ -21,7 +21,7 @@ type Msg
     = OpenFileSelect
     | StartUpload File
     | UrlGenerated String
-    | Error File
+    | Error File Int
     | Done File
 
 
@@ -60,7 +60,7 @@ uploadFile file url =
                     Done file
 
                 _ ->
-                    Error file
+                    Error file 0
     in
     Http.request
         { method = "PUT"
@@ -75,12 +75,17 @@ uploadFile file url =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        uploadStatus : File -> String -> Int -> { filename : String, id : String, progress : Int, status : String }
+        uploadStatus file status progress =
+            { id = File.name file, filename = File.name file, status = status, progress = progress }
+    in
     case msg of
         OpenFileSelect ->
             ( model, Select.file model.types StartUpload )
 
         StartUpload file ->
-            ( { model | file = Just file }, Ports.requestUrl (File.name file) )
+            ( { model | file = Just file }, Ports.requestUrl { id = File.name file, filename = File.name file } )
 
         UrlGenerated url ->
             let
@@ -95,10 +100,10 @@ update msg model =
             ( { model | url = Just url }, cmd )
 
         Done file ->
-            ( none, Ports.notifyUploadStatus { fileId = File.name file, status = "Done" } )
+            ( none, Ports.notifyUploadStatus (uploadStatus file "Done" 100) )
 
-        Error file ->
-            ( none, Ports.notifyUploadStatus { fileId = File.name file, status = "Error" } )
+        Error file progress ->
+            ( none, Ports.notifyUploadStatus (uploadStatus file "Error" progress) )
 
 
 view : Model -> Html Msg
