@@ -1,4 +1,4 @@
-module Upload exposing (Upload, UploadStatus, createUpload, updateUploadProgress, uploadStatus)
+module Upload exposing (Upload, UploadId, UploadStatus, createUpload, updateUploadProgress, uploadStatus)
 
 import Bytes exposing (Bytes)
 import File exposing (File)
@@ -7,16 +7,20 @@ import SHA256 as SHA
 import Task exposing (Task)
 
 
+type alias UploadId =
+    String
+
+
 type alias Upload =
     { file : File
-    , id : String
+    , id : UploadId
     , name : String
     , progress : Int
     }
 
 
 type alias UploadStatus =
-    { filename : String, id : String, progress : Int, status : String }
+    { filename : String, id : UploadId, progress : Int, status : String }
 
 
 createUpload : File -> Task x Upload
@@ -26,18 +30,18 @@ createUpload file =
         convertToBytes =
             File.toBytes
 
-        bytesToHash : Bytes -> Task x String
+        bytesToHash : Bytes -> Task x UploadId
         bytesToHash =
             Task.succeed << hashFromBytes
 
-        setIdInUpload : String -> Task x Upload
+        setIdInUpload : UploadId -> Task x Upload
         setIdInUpload =
             Task.succeed << makeUpload file
     in
     file |> File.toBytes |> Task.andThen bytesToHash |> Task.andThen setIdInUpload
 
 
-hashFromBytes : Bytes -> String
+hashFromBytes : Bytes -> UploadId
 hashFromBytes bytes =
     bytes
         |> SHA.fromBytes

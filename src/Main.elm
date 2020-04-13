@@ -9,7 +9,7 @@ import Http exposing (Progress)
 import Json.Decode as Json exposing (Value)
 import Ports
 import Task exposing (Task)
-import Upload exposing (Upload, createUpload, updateUploadProgress, uploadStatus)
+import Upload exposing (Upload, UploadId, createUpload, updateUploadProgress, uploadStatus)
 
 
 type alias Model =
@@ -24,8 +24,8 @@ type Msg
     | StartUpload Upload
     | UrlGenerated String
     | UploadProgress Upload Progress
-    | Error Upload
-    | Done Upload
+    | Error UploadId
+    | Done UploadId
 
 
 init : Value -> ( Model, Cmd Msg )
@@ -69,10 +69,10 @@ startUpload upload url =
         handleResponse result =
             case result of
                 Ok string ->
-                    Done upload
+                    Done upload.id
 
                 _ ->
-                    Error upload
+                    Error upload.id
     in
     Http.request
         { method = "PUT"
@@ -83,6 +83,16 @@ startUpload upload url =
         , timeout = Nothing
         , tracker = Just upload.id
         }
+
+
+notifyUploadStatus : Model -> String -> Cmd Msg
+notifyUploadStatus model status =
+    case model.upload of
+        Just upload ->
+            Ports.notifyUploadStatus (uploadStatus upload status)
+
+        _ ->
+            Cmd.none
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -113,11 +123,11 @@ update msg model =
             in
             ( { model | upload = Just updated }, Ports.notifyUploadStatus (uploadStatus updated "InProgress") )
 
-        Done upload ->
-            ( none, Ports.notifyUploadStatus (uploadStatus upload "Done") )
+        Done uploadId ->
+            ( none, notifyUploadStatus model "Done" )
 
-        Error upload ->
-            ( none, Ports.notifyUploadStatus (uploadStatus upload "Error") )
+        Error uploadId ->
+            ( none, notifyUploadStatus model "Error" )
 
 
 view : Model -> Html Msg
