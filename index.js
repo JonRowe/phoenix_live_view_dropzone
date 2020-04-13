@@ -1,21 +1,34 @@
 'use strict';
 
-const setup = ({node, generateUrl, onStatusUpdate}) => {
-  var app = Elm.Main.init({flags: {}, node: document.getElementById(node)});
+import { Elm } from "./elm.js";
 
-  app.ports.requestUrl.subscribe(function(fileId) {
-    app.ports.addUploadUrl.send(generateUrl(fileId));
-  });
+export class PhoenixLiveViewDropzone {
+  mounted() {
+    var node = document.createElement("div");
+    this.el.appendChild(node);
 
-  app.ports.notifyUploadStatus.subscribe(onStatusUpdate);
-};
+    var liveView = this;
 
-var target;
+    var generateUrl = (fileId) => liveView.pushEvent("phx-dropzone-generate-file-url", fileId);
+    var onStatusUpdate = (result) => liveView.pushEvent("phx-dropzone-status", result);
 
-if (typeof(module) != "undefined") {
-  target = module.exports;
-} else {
-  target = this;
+    this.app = Elm.Main.init({flags: {}, node: node});
+    this.app.ports.requestUrl.subscribe(generateUrl);
+    this.app.ports.notifyUploadStatus.subscribe(onStatusUpdate);
+
+    this.dataId = this.el.dataset.id;
+    this.dataUrl = this.el.dataset.url;
+  }
+
+  updated() {
+    var dataset = this.el.dataset;
+    consolg.log(dataset)
+    if (dataset && this.dataId !== dataset.id && this.dataUrl !== dataset.url) {
+      this.dataId = dataset.id;
+      this.dataUrl = dataset.url;
+      this.app.ports.addUploadUrl.send(this.dataUrl);
+    }
+  }
 }
 
-target.PhoenixLiveViewDropzone = {setup: setup};
+export default PhoenixLiveViewDropzone;
