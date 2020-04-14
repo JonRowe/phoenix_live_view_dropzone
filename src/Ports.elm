@@ -4,7 +4,7 @@ import Json.Encode exposing (Value)
 import Upload exposing (Upload, UploadExport, UploadId, UploadTarget, export)
 
 
-port requestUrl : { id : UploadId, filename : String } -> Cmd msg
+port requestUrl : { id : UploadId, name : String } -> Cmd msg
 
 
 port addUploadUrl : (UploadTarget -> msg) -> Sub msg

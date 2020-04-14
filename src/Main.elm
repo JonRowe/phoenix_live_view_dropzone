@@ -126,7 +126,7 @@ update msg model =
             ( model, Task.perform StartUpload (createUpload file) )
 
         StartUpload upload ->
-            ( setUpload upload, Ports.requestUrl { id = upload.id, filename = upload.name } )
+            ( setUpload upload, Ports.requestUrl { id = upload.id, name = upload.name } )
 
         UrlGenerated target ->
             case Uploads.get model.uploads target.id of
