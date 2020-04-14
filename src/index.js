@@ -14,7 +14,7 @@ export class PhoenixLiveViewDropzone {
 
     this.app = Elm.Main.init({flags: {}, node: node});
     this.app.ports.requestUrl.subscribe(generateUrl);
-    this.app.ports.notifyUploadStatus.subscribe(statusUpdate);
+    this.app.ports.uploadStatus.subscribe(statusUpdate);
 
     this.dataId = this.el.dataset.id;
     this.dataUrl = this.el.dataset.url;

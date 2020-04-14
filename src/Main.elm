@@ -9,7 +9,7 @@ import Http exposing (Progress)
 import Json.Decode as Json exposing (Value)
 import Ports
 import Task exposing (Task)
-import Upload exposing (Upload, UploadId, UploadTarget, createUpload, updateUploadProgress, uploadStatus)
+import Upload exposing (Upload, UploadId, UploadStatus(..), UploadTarget, createUpload, updateUploadProgress)
 import Uploads exposing (Uploads)
 
 
@@ -84,11 +84,11 @@ startUpload upload url =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     let
-        notifyUploadStatus : UploadId -> String -> Cmd Msg
+        notifyUploadStatus : UploadId -> UploadStatus -> Cmd Msg
         notifyUploadStatus id status =
             case Uploads.get model.uploads id of
                 Just upload ->
-                    Ports.notifyUploadStatus (uploadStatus upload status)
+                    Ports.notifyUploadStatus { upload | status = status }
 
                 _ ->
                     Cmd.none
@@ -97,7 +97,7 @@ update msg model =
         setUpload upload =
             { model | uploads = Uploads.update model.uploads upload }
 
-        setUploadStatus : UploadId -> String -> ( Model, Cmd Msg )
+        setUploadStatus : UploadId -> UploadStatus -> ( Model, Cmd Msg )
         setUploadStatus id status =
             let
                 newModel : Model
@@ -130,13 +130,13 @@ update msg model =
                 updated =
                     updateUploadProgress upload progress
             in
-            ( setUpload updated, Ports.notifyUploadStatus (uploadStatus updated "InProgress") )
+            ( setUpload updated, Ports.notifyUploadStatus updated )
 
         Done uploadId ->
-            setUploadStatus uploadId "Done"
+            setUploadStatus uploadId Upload.Done
 
         Error uploadId ->
-            setUploadStatus uploadId "Error"
+            setUploadStatus uploadId Upload.Error
 
 
 view : Model -> Html Msg

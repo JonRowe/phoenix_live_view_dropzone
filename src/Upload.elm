@@ -1,4 +1,4 @@
-module Upload exposing (Upload, UploadId, UploadStatus, UploadTarget, createUpload, updateUploadProgress, uploadStatus)
+module Upload exposing (Upload, UploadExport, UploadId, UploadStatus(..), UploadTarget, createUpload, export, updateUploadProgress)
 
 import File exposing (File)
 import Http exposing (Progress(..))
@@ -10,6 +10,22 @@ type alias UploadId =
     String
 
 
+type UploadStatus
+    = InProgress
+    | Done
+    | Error
+
+
+type alias UploadExport =
+    { id : UploadId
+    , name : String
+    , progress : Int
+    , sent : Int
+    , size : Int
+    , status : String
+    }
+
+
 type alias Upload =
     { file : File
     , id : UploadId
@@ -17,6 +33,7 @@ type alias Upload =
     , progress : Int
     , sent : Int
     , size : Int
+    , status : UploadStatus
     }
 
 
@@ -24,10 +41,6 @@ type alias UploadTarget =
     { id : UploadId
     , url : String
     }
-
-
-type alias UploadStatus =
-    { filename : String, id : UploadId, progress : Int, status : String }
 
 
 createUpload : File -> Task x Upload
@@ -48,6 +61,24 @@ createUpload file =
     Time.now |> Task.andThen generateId |> Task.andThen setIdInUpload
 
 
+export : Upload -> UploadExport
+export upload =
+    let
+        status : String
+        status =
+            case upload.status of
+                InProgress ->
+                    "InProgress"
+
+                Done ->
+                    "Done"
+
+                Error ->
+                    "Error"
+    in
+    { id = upload.id, name = upload.name, progress = upload.progress, sent = upload.sent, size = upload.size, status = status }
+
+
 makeUpload : File -> String -> Upload
 makeUpload file id =
     let
@@ -59,7 +90,7 @@ makeUpload file id =
         size =
             File.size file
     in
-    { file = file, id = id, name = name, progress = 0, sent = 0, size = size }
+    { file = file, id = id, name = name, progress = 0, sent = 0, size = size, status = InProgress }
 
 
 updateUploadProgress : Upload -> Progress -> Upload
@@ -75,8 +106,3 @@ updateUploadProgress upload progress =
 
         _ ->
             upload
-
-
-uploadStatus : Upload -> String -> UploadStatus
-uploadStatus upload status =
-    { id = upload.id, filename = upload.name, status = status, progress = upload.progress }
