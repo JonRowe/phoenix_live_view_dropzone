@@ -47,5 +47,9 @@ defmodule PhoenixLiveViewDropzoneTest do
     assert render([hook: "Custom"]) =~ ~r{<div\s*[^>]*phx-hook="Custom"[^>]*>\s*</div>}
   end
 
+  test "it allows customising the button test" do
+    assert render([button_text: "Custom"]) =~ ~r{<div\s*[^>]*data-button-text="Custom"[^>]*>\s*</div>}
+  end
+
   defp render(assigns), do: render_component(PhoenixLiveViewDropzone, assigns)
 end

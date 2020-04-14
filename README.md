@@ -72,6 +72,7 @@ Is issued as the file is uploaded, and on completion. The payload id:
   * `dom_id` - string - Sets the id attribute on the outer div, defaults to `phoenix-live-view-dropzone`.
   * `css_class` - string - Sets the class attribute on the outer div, defaults to `phoenix-live-view-dropzone`.
   * `hook_name` - string - Sets the `phx-hook` value on the outer div, defaults to `PhoenixLiveViewDropzone`.
+  * `button_text` - string - Sets the text of the button in the drop zone.
 
 ## Installation
 

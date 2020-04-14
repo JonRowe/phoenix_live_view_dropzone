@@ -27,6 +27,7 @@ defmodule PhoenixLiveViewDropzone do
       data-url="<%= data(assigns)[:url] %>"
       phx-update="ignore"
       phx-hook="<%= hook_name(assigns) %>"
+      <%= optional_attributes(assigns) %>
     >
     </div>
     """
@@ -43,4 +44,13 @@ defmodule PhoenixLiveViewDropzone do
 
   defp hook_name(%{hook: name}) when is_binary(name), do: name
   defp hook_name(_), do: "PhoenixLiveViewDropzone"
+
+  defp optional_attributes(%{button_text: text} = assigns) do
+    ~L"""
+    data-button-text="<%= text %>"
+    <%= optional_attributes(Map.delete(assigns, :button_text)) %>
+    """
+  end
+
+  defp optional_attributes(_), do: ""
 end
