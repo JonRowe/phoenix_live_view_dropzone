@@ -14,8 +14,15 @@ import Uploads exposing (Uploads)
 
 
 type alias Model =
-    { types : List String
+    { buttonText : String
+    , fileTypes : List String
     , uploads : Uploads
+    }
+
+
+type alias Config =
+    { buttonText : String
+    , fileTypes : List String
     }
 
 
@@ -31,21 +38,26 @@ type Msg
 
 init : Value -> ( Model, Cmd Msg )
 init config =
-    ( none, Cmd.none )
+    let
+        buttonText : String
+        buttonText =
+            case Json.decodeValue (Json.field "buttonText" Json.string) config of
+                Ok text ->
+                    text
 
+                _ ->
+                    "Upload"
 
-filetypes : List String
-filetypes =
-    [ "application/octext"
-    , "txt/plain"
-    ]
+        fileTypes : List String
+        fileTypes =
+            case Json.decodeValue (Json.field "fileTypes" (Json.list Json.string)) config of
+                Ok list ->
+                    list
 
-
-none : Model
-none =
-    { types = filetypes
-    , uploads = Uploads.empty
-    }
+                _ ->
+                    []
+    in
+    ( { buttonText = buttonText, fileTypes = fileTypes, uploads = Uploads.empty }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -108,7 +120,7 @@ update msg model =
     in
     case msg of
         OpenFileSelect ->
-            ( model, Select.file model.types FileSelected )
+            ( model, Select.file model.fileTypes FileSelected )
 
         FileSelected file ->
             ( model, Task.perform StartUpload (createUpload file) )
@@ -142,7 +154,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ button [ onClick OpenFileSelect ] [ text "Upload" ]
+        [ button [ onClick OpenFileSelect ] [ text model.buttonText ]
         ]
 
 
