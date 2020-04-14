@@ -4,12 +4,17 @@ defmodule PhoenixLiveViewDropzone.MixProject do
   def project do
     [
       app: :phoenix_live_view_dropzone,
-      version: "0.1.0",
+      description: "A Phoenix LiveView compatible file dropzone.",
+      version: "0.0.1",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       name: "PhoenixLiveViewDropzone",
       source_url: "https://github.com/JonRowe/phoenix_live_view_dropzone",
+      package: [
+        licenses: ["MIT"],
+        links: %{}
+      ],
       docs: [
         main: "readme",
         extras: ["README.md"]
