@@ -1,5 +1,8 @@
 defmodule PhoenixLiveViewDropzone do
   @moduledoc """
+    Phoenix Live View Dropzone
+
+    A file upload solution for Phoenix Live View.
   """
 
   use Phoenix.LiveComponent
@@ -7,6 +10,13 @@ defmodule PhoenixLiveViewDropzone do
   @default_name "phoenix-live-view-dropzone"
 
   @doc """
+  Renders the LiveComponent.
+
+  ## Options
+  * `file_data` - map - A `%{"id" => id, "url" => url}` assign used to pass upload urls to the component hook.
+  * `dom_id` - string - Sets the id attribute on the outer div, defaults to `phoenix-live-view-dropzone`.
+  * `css_class` - string - Sets the class attribute on the outer div, defaults to `phoenix-live-view-dropzone`.
+  * `hook_name` - string - Sets the `phx-hook` value on the outer div, defaults to `PhoenixLiveViewDropzone`.
   """
   def render(assigns) do
     ~L"""
