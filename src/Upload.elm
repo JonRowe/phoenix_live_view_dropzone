@@ -16,6 +16,8 @@ type alias Upload =
     , id : UploadId
     , name : String
     , progress : Int
+    , sent : Int
+    , size : Int
     }
 
 
@@ -57,11 +59,15 @@ hashFromBytes bytes =
 makeUpload : File -> String -> Upload
 makeUpload file id =
     let
-        filename : String
-        filename =
+        name : String
+        name =
             File.name file
+
+        size : Int
+        size =
+            File.size file
     in
-    { file = file, id = id, name = filename, progress = 0 }
+    { file = file, id = id, name = name, progress = 0, sent = 0, size = size }
 
 
 updateUploadProgress : Upload -> Progress -> Upload
@@ -71,9 +77,9 @@ updateUploadProgress upload progress =
             let
                 percentage : Int
                 percentage =
-                    ceiling (Http.fractionSent data) * 100
+                    ceiling ((toFloat data.sent / toFloat upload.size) * 100)
             in
-            { upload | progress = percentage }
+            { upload | progress = percentage, sent = data.sent }
 
         _ ->
             upload
