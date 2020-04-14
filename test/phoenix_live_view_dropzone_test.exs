@@ -51,5 +51,13 @@ defmodule PhoenixLiveViewDropzoneTest do
     assert render([button_text: "Custom"]) =~ ~r{<div\s*[^>]*data-button-text="Custom"[^>]*>\s*</div>}
   end
 
+  test "it allows customising the file types with a string" do
+    assert render([file_types: "application/custom,image/png"]) =~ ~r{<div\s*[^>]*data-file-types="application/custom,image/png"[^>]*>\s*</div>}
+  end
+
+  test "it allows customising the file types with a list of strings" do
+    assert render([file_types: ~w[application/custom image/png]]) =~ ~r{<div\s*[^>]*data-file-types="application/custom,image/png"[^>]*>\s*</div>}
+  end
+
   defp render(assigns), do: render_component(PhoenixLiveViewDropzone, assigns)
 end

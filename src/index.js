@@ -18,6 +18,10 @@ export class PhoenixLiveViewDropzone {
       flags.buttonText = this.el.dataset.buttonText;
     }
 
+    if (this.el.dataset.fileTypes) {
+      flags.fileTypes = this.el.dataset.fileTypes.split(",");
+    }
+
     this.app = Elm.Main.init({flags: flags, node: node});
     this.app.ports.requestUrl.subscribe(generateUrl);
     this.app.ports.uploadStatus.subscribe(statusUpdate);
