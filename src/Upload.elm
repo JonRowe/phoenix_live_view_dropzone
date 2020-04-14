@@ -1,10 +1,9 @@
 module Upload exposing (Upload, UploadId, UploadStatus, UploadTarget, createUpload, updateUploadProgress, uploadStatus)
 
-import Bytes exposing (Bytes)
 import File exposing (File)
 import Http exposing (Progress(..))
-import SHA256 as SHA
 import Task exposing (Task)
+import Time exposing (Posix)
 
 
 type alias UploadId =
@@ -34,26 +33,19 @@ type alias UploadStatus =
 createUpload : File -> Task x Upload
 createUpload file =
     let
-        convertToBytes : File -> Task x Bytes
-        convertToBytes =
-            File.toBytes
+        idFromTime : Posix -> UploadId
+        idFromTime posix =
+            Time.posixToMillis posix |> String.fromInt
 
-        bytesToHash : Bytes -> Task x UploadId
-        bytesToHash =
-            Task.succeed << hashFromBytes
+        generateId : Posix -> Task x UploadId
+        generateId =
+            Task.succeed << idFromTime
 
         setIdInUpload : UploadId -> Task x Upload
         setIdInUpload =
             Task.succeed << makeUpload file
     in
-    file |> File.toBytes |> Task.andThen bytesToHash |> Task.andThen setIdInUpload
-
-
-hashFromBytes : Bytes -> UploadId
-hashFromBytes bytes =
-    bytes
-        |> SHA.fromBytes
-        |> SHA.toHex
+    Time.now |> Task.andThen generateId |> Task.andThen setIdInUpload
 
 
 makeUpload : File -> String -> Upload
