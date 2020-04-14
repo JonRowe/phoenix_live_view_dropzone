@@ -3,8 +3,9 @@ module Main exposing (main)
 import Browser
 import File exposing (File)
 import File.Select as Select
-import Html exposing (Html, br, button, div, text)
-import Html.Events exposing (onClick)
+import Html exposing (Attribute, Html, br, button, div, text)
+import Html.Attributes exposing (class)
+import Html.Events exposing (onClick, preventDefaultOn)
 import Http exposing (Progress)
 import Json.Decode as Json exposing (Value)
 import Ports
@@ -16,6 +17,7 @@ import Uploads exposing (Uploads)
 type alias Model =
     { buttonText : String
     , fileTypes : List String
+    , hover : Bool
     , uploads : Uploads
     }
 
@@ -28,6 +30,7 @@ type alias Config =
 
 type Msg
     = OpenFileSelect
+    | SetHover Bool
     | FileSelected File (List File)
     | StartUpload Upload
     | UrlGenerated UploadTarget
@@ -57,7 +60,7 @@ init config =
                 _ ->
                     []
     in
-    ( { buttonText = buttonText, fileTypes = fileTypes, uploads = Uploads.empty }, Cmd.none )
+    ( { buttonText = buttonText, fileTypes = fileTypes, hover = False, uploads = Uploads.empty }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -122,6 +125,9 @@ update msg model =
         OpenFileSelect ->
             ( model, Select.files model.fileTypes FileSelected )
 
+        SetHover hover ->
+            ( { model | hover = hover }, Cmd.none )
+
         FileSelected file files ->
             ( model, file :: files |> List.map (createUpload StartUpload) |> Cmd.batch )
 
@@ -153,7 +159,30 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
+    let
+        decodeDrop : Json.Decoder Msg
+        decodeDrop =
+            Json.at [ "dataTransfer", "files" ] (Json.oneOrMore FileSelected File.decoder)
+
+        preventDefault : msg -> ( msg, Bool )
+        preventDefault msg =
+            ( msg, True )
+
+        dragHandler : String -> Json.Decoder msg -> Attribute msg
+        dragHandler event decoder =
+            preventDefaultOn event (Json.map preventDefault decoder)
+    in
+    div
+        [ if model.hover then
+            class "drag-hovering"
+
+          else
+            class ""
+        , dragHandler "dragenter" (Json.succeed (SetHover True))
+        , dragHandler "dragover" (Json.succeed (SetHover True))
+        , dragHandler "dragleave" (Json.succeed (SetHover False))
+        , dragHandler "drop" decodeDrop
+        ]
         [ button [ onClick OpenFileSelect ] [ text model.buttonText ]
         ]
 
