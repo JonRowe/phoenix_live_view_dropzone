@@ -28,7 +28,7 @@ type alias Config =
 
 type Msg
     = OpenFileSelect
-    | FileSelected File
+    | FileSelected File (List File)
     | StartUpload Upload
     | UrlGenerated UploadTarget
     | UploadProgress Upload Progress
@@ -120,10 +120,10 @@ update msg model =
     in
     case msg of
         OpenFileSelect ->
-            ( model, Select.file model.fileTypes FileSelected )
+            ( model, Select.files model.fileTypes FileSelected )
 
-        FileSelected file ->
-            ( model, Task.perform StartUpload (createUpload file) )
+        FileSelected file files ->
+            ( model, file :: files |> List.map (createUpload StartUpload) |> Cmd.batch )
 
         StartUpload upload ->
             ( setUpload upload, Ports.requestUrl { id = upload.id, name = upload.name } )

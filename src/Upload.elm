@@ -43,8 +43,8 @@ type alias UploadTarget =
     }
 
 
-createUpload : File -> Task x Upload
-createUpload file =
+createUpload : (Upload -> msg) -> File -> Cmd msg
+createUpload msg file =
     let
         idFromTime : Posix -> UploadId
         idFromTime posix =
@@ -58,7 +58,7 @@ createUpload file =
         setIdInUpload =
             Task.succeed << makeUpload file
     in
-    Time.now |> Task.andThen generateId |> Task.andThen setIdInUpload
+    Time.now |> Task.andThen generateId |> Task.andThen setIdInUpload |> Task.perform msg
 
 
 export : Upload -> UploadExport
