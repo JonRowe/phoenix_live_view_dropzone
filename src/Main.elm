@@ -42,23 +42,26 @@ type Msg
 init : Value -> ( Model, Cmd Msg )
 init config =
     let
-        buttonText : String
-        buttonText =
-            case Json.decodeValue (Json.field "buttonText" Json.string) config of
-                Ok text ->
-                    text
+        parseFrom : String -> a -> Json.Decoder a -> a
+        parseFrom field default decoder =
+            case Json.decodeValue (Json.field field decoder) config of
+                Ok value ->
+                    value
 
                 _ ->
-                    "Upload"
+                    default
+
+        parseTextFrom : String -> String -> String
+        parseTextFrom field default =
+            parseFrom field default Json.string
+
+        buttonText : String
+        buttonText =
+            parseTextFrom "buttonText" "Upload"
 
         fileTypes : List String
         fileTypes =
-            case Json.decodeValue (Json.field "fileTypes" (Json.list Json.string)) config of
-                Ok list ->
-                    list
-
-                _ ->
-                    []
+            parseFrom "fileTypes" [] (Json.list Json.string)
     in
     ( { buttonText = buttonText, fileTypes = fileTypes, hover = False, uploads = Uploads.empty }, Cmd.none )
 
