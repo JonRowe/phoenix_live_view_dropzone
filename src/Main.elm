@@ -18,6 +18,7 @@ type alias Model =
     { buttonText : String
     , fileTypes : List String
     , hover : Bool
+    , text : String
     , uploads : Uploads
     }
 
@@ -62,8 +63,12 @@ init config =
         fileTypes : List String
         fileTypes =
             parseFrom "fileTypes" [] (Json.list Json.string)
+
+        text : String
+        text =
+            parseTextFrom "text" ""
     in
-    ( { buttonText = buttonText, fileTypes = fileTypes, hover = False, uploads = Uploads.empty }, Cmd.none )
+    ( { buttonText = buttonText, fileTypes = fileTypes, hover = False, text = text, uploads = Uploads.empty }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -186,7 +191,8 @@ view model =
         , dragHandler "dragleave" (Json.succeed (SetHover False))
         , dragHandler "drop" decodeDrop
         ]
-        [ button [ onClick OpenFileSelect ] [ text model.buttonText ]
+        [ text model.text
+        , button [ onClick OpenFileSelect ] [ text model.buttonText ]
         ]
 
 

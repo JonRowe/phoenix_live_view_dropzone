@@ -74,6 +74,7 @@ Is issued as the file is uploaded, and on completion. The payload id:
   * `hook_name` - string - Sets the `phx-hook` value on the outer div, defaults to `PhoenixLiveViewDropzone`.
   * `button_text` - string - Sets the text of the button in the drop zone.
   * `file_types` - string or list of strings - Sets the mime types the file picker will allow.
+  * `text` - string - Sets text that will be displayed above the button in the dropzone.
 
 ## Installation
 

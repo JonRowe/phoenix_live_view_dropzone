@@ -59,5 +59,9 @@ defmodule PhoenixLiveViewDropzoneTest do
     assert render([file_types: ~w[application/custom image/png]]) =~ ~r{<div\s*[^>]*data-file-types="application/custom,image/png"[^>]*>\s*</div>}
   end
 
+  test "it allows setting dropzone text" do
+    assert render([text: "Custom"]) =~ ~r{<div\s*[^>]*data-text="Custom"[^>]*>\s*</div>}
+  end
+
   defp render(assigns), do: render_component(PhoenixLiveViewDropzone, assigns)
 end
