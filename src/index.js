@@ -9,8 +9,16 @@ export class PhoenixLiveViewDropzone {
 
     var liveView = this;
 
-    var generateUrl = (data) => liveView.pushEvent("phx-dropzone",["generate-url", data]);
-    var statusUpdate = (data) => liveView.pushEvent("phx-dropzone", ["file-status", data]);
+    var generateUrl, statusUpdate;
+
+    if (this.el.dataset.target) {
+      var target = this.el.dataset.target;
+      generateUrl = (data) => liveView.pushEventTo(target, "phx-dropzone", ["generate-url", data]);
+      statusUpdate = (data) => liveView.pushEventTo(target, "phx-dropzone", ["file-status", data]);
+    } else {
+      generateUrl = (data) => liveView.pushEvent("phx-dropzone", ["generate-url", data]);
+      statusUpdate = (data) => liveView.pushEvent("phx-dropzone", ["file-status", data]);
+    }
 
     var flags = {};
 

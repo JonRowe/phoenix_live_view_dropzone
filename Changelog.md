@@ -1,3 +1,7 @@
+# 0.0.4
+
+* Support phx-target on component
+
 # 0.0.3 (2020-04-14)
 
 * Fix documentation homepage on hexdocs.

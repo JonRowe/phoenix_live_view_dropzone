@@ -18,6 +18,7 @@ defmodule PhoenixLiveViewDropzone do
   * `css_class` - string - Sets the class attribute on the outer div, defaults to `phoenix-live-view-dropzone`.
   * `hook_name` - string - Sets the `phx-hook` value on the outer div, defaults to `PhoenixLiveViewDropzone`.
   * `file_types` - string or list of strings - Sets the mime types the file picker will allow.
+  * `target` - string - Sets the phx-target value for events.
   * `text` - string - Sets text that will be displayed above the button in the dropzone.
   """
   def render(assigns) do
@@ -65,6 +66,13 @@ defmodule PhoenixLiveViewDropzone do
     ~L"""
     data-file-types="<%= types %>"
     <%= optional_attributes(Map.delete(assigns, :file_types)) %>
+    """
+  end
+
+  defp optional_attributes(%{target: target} = assigns) do
+    ~L"""
+    data-target="<%= target %>"
+    <%= optional_attributes(Map.delete(assigns, :target)) %>
     """
   end
 
