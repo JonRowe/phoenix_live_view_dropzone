@@ -1,7 +1,7 @@
 defmodule PhoenixLiveViewDropzone.MixProject do
   use Mix.Project
 
-  @version "0.0.2"
+  @version "0.0.3"
 
   def project do
     [
@@ -28,6 +28,7 @@ defmodule PhoenixLiveViewDropzone.MixProject do
   defp docs do
     [
       main: "readme",
+      extras: ["README.md"],
       source_ref: "v#{@version}",
       source_url: "https://github.com/JonRowe/phoenix_live_view_dropzone"
     ]
