@@ -1,6 +1,6 @@
-# 0.0.4
+# 0.0.4 (2020-04-18)
 
-* Support phx-target on component
+* Support phx-target on component.
 
 # 0.0.3 (2020-04-14)
 
