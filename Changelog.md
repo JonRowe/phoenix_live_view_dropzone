@@ -1,3 +1,7 @@
+# 0.0.6 (2020-04-20)
+
+* Add phoenix_live_view 0.12 support.
+
 # 0.0.5 (2020-04-20)
 
 * Set button type to text to avoid triggering forms.
