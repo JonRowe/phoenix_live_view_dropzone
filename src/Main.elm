@@ -4,7 +4,7 @@ import Browser
 import File exposing (File)
 import File.Select as Select
 import Html exposing (Attribute, Html, br, button, div, text)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, type_)
 import Html.Events exposing (onClick, preventDefaultOn)
 import Http exposing (Progress)
 import Json.Decode as Json exposing (Value)
@@ -192,7 +192,7 @@ view model =
         , dragHandler "drop" decodeDrop
         ]
         [ text model.text
-        , button [ onClick OpenFileSelect ] [ text model.buttonText ]
+        , button [ onClick OpenFileSelect, type_ "button" ] [ text model.buttonText ]
         ]
 
 
