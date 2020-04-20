@@ -1,3 +1,7 @@
+# 0.0.5 (2020-04-20)
+
+* Set button type to text to avoid triggering forms.
+
 # 0.0.4 (2020-04-18)
 
 * Support phx-target on component.
