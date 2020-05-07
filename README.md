@@ -46,7 +46,7 @@ Is issued on the file first being selected to generate a url to upload to. The p
 %{"id" => "string-id-for-file", "name" => "string-filename-on-disk" }
 ```
 
-To respond to this you are expected to assign `file_data` to `%{"id" => id, "url" => your_url}`. \
+To respond to this you are expected to assign `file_data` to `%{id: id, url: your_url}`. \
 You need to do this only long enough for the updated hook to fire and uploading to begin.
 
 2) `file-status`
