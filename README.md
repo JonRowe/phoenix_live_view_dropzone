@@ -19,7 +19,7 @@ e.g.
   <%= live_component @socket, PhoenixLiveViewDropzone, file_data: @file_data %>
 ```
 
-Where `@file_data` is expected to be a map `%{"id" => id, "url" => url}` which can be blank by default.
+Where `@file_data` is expected to be a map `%{id: id, url: url}` which can be blank by default.
 
 
 When a file is uploaded the view will emit `phx-dropzone` events via live view in the following structure:
