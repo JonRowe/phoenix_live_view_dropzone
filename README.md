@@ -86,7 +86,7 @@ Then the package can be installed by adding `phoenix_live_view_dropzone` to your
 ```elixir
 def deps do
   [
-    {:phoenix_live_view_dropzone, "~> 0.0.6"}
+    {:phoenix_live_view_dropzone, "~> 0.0.7"}
   ]
 end
 ```

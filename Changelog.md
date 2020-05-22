@@ -1,3 +1,7 @@
+# 0.0.7 (2020-05-22)
+
+* Add phoenix_live_view 0.13 support.
+
 # 0.0.6 (2020-04-20)
 
 * Add phoenix_live_view 0.12 support.
