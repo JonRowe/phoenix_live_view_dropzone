@@ -100,7 +100,7 @@ You then need to wire up the package dependency, in your package.json add:
 And connect the hook.
 
 ```javascript
-import { PhoenixLiveViewDropzone } from “phoenix_live_view_drop_zone”;
+import { PhoenixLiveViewDropzone } from "phoenix_live_view_drop_zone";
 
 let Hooks = {};
 Hooks.PhoenixLiveViewDropzone = new PhoenixLiveViewDropzone();
