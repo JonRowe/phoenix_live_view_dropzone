@@ -48,6 +48,13 @@ defmodule PhoenixLiveViewDropzone do
   defp hook_name(%{hook: name}) when is_binary(name), do: name
   defp hook_name(_), do: "PhoenixLiveViewDropzone"
 
+  defp optional_attributes(%{button_class: class} = assigns) do
+    ~L"""
+    data-button-class="<%= class %>"
+    <%= optional_attributes(Map.delete(assigns, :button_class)) %>
+    """
+  end
+
   defp optional_attributes(%{button_text: text} = assigns) do
     ~L"""
     data-button-text="<%= text %>"

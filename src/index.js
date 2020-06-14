@@ -27,6 +27,10 @@ export class PhoenixLiveViewDropzone {
 
     var flags = {};
 
+    if (this.el.dataset.buttonClass) {
+      flags.buttonClass = this.el.dataset.buttonClass;
+    }
+
     if (this.el.dataset.buttonText) {
       flags.buttonText = this.el.dataset.buttonText;
     }

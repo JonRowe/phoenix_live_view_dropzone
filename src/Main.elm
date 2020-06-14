@@ -15,7 +15,8 @@ import Uploads exposing (Uploads)
 
 
 type alias Model =
-    { buttonText : String
+    { buttonClass : String
+    , buttonText : String
     , fileTypes : List String
     , hover : Bool
     , text : String
@@ -24,7 +25,8 @@ type alias Model =
 
 
 type alias Config =
-    { buttonText : String
+    { buttonClass : String
+    , buttonText : String
     , fileTypes : List String
     }
 
@@ -56,6 +58,10 @@ init config =
         parseTextFrom field default =
             parseFrom field default Json.string
 
+        buttonClass : String
+        buttonClass =
+            parseTextFrom "buttonClass" ""
+
         buttonText : String
         buttonText =
             parseTextFrom "buttonText" "Upload"
@@ -68,7 +74,7 @@ init config =
         text =
             parseTextFrom "text" ""
     in
-    ( { buttonText = buttonText, fileTypes = fileTypes, hover = False, text = text, uploads = Uploads.empty }, Cmd.none )
+    ( { buttonClass = buttonClass, buttonText = buttonText, fileTypes = fileTypes, hover = False, text = text, uploads = Uploads.empty }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -192,7 +198,7 @@ view model =
         , dragHandler "drop" decodeDrop
         ]
         [ text model.text
-        , button [ onClick OpenFileSelect, type_ "button" ] [ text model.buttonText ]
+        , button [ class model.buttonClass, onClick OpenFileSelect, type_ "button" ] [ text model.buttonText ]
         ]
 
 
