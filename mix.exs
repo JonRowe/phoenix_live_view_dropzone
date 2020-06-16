@@ -11,7 +11,8 @@ defmodule PhoenixLiveViewDropzone.MixProject do
       version: @version,
       deps: deps(),
       docs: docs(),
-      package: package()
+      package: package(),
+      compilers: [:phoenix] ++ Mix.compilers()
     ]
   end
 
