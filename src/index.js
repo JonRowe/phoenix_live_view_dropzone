@@ -7,17 +7,22 @@ export class PhoenixLiveViewDropzone {
     var node = document.createElement("div");
     this.el.appendChild(node);
 
-    var liveView = this;
+    this.target = this.el.dataset.target;
 
-    var generateUrl, statusUpdate;
+    this.generateUrl = (data) => {
+      if (this.target) {
+        this.pushEventTo(this.target, "phx-dropzone", ["generate-url", data]);
+      } else {
+        this.pushEvent("phx-dropzone", ["generate-url", data]);
+      }
+    }
 
-    if (this.el.dataset.target) {
-      var target = this.el.dataset.target;
-      generateUrl = (data) => liveView.pushEventTo(target, "phx-dropzone", ["generate-url", data]);
-      statusUpdate = (data) => liveView.pushEventTo(target, "phx-dropzone", ["file-status", data]);
-    } else {
-      generateUrl = (data) => liveView.pushEvent("phx-dropzone", ["generate-url", data]);
-      statusUpdate = (data) => liveView.pushEvent("phx-dropzone", ["file-status", data]);
+    this.statusUpdate = (data) => {
+      if (this.target) {
+          this.pushEventTo(this.target, "phx-dropzone", ["file-status", data]);
+        } else {
+          this.pushEvent("phx-dropzone", ["file-status", data]);
+      }
     }
 
     var flags = {};
@@ -35,8 +40,8 @@ export class PhoenixLiveViewDropzone {
     }
 
     this.app = Elm.Main.init({flags: flags, node: node});
-    this.app.ports.requestUrl.subscribe(generateUrl);
-    this.app.ports.uploadStatus.subscribe(statusUpdate);
+    this.app.ports.requestUrl.subscribe(this.generateUrl);
+    this.app.ports.uploadStatus.subscribe(this.statusUpdate);
 
     this.dataId = this.el.dataset.id;
     this.dataUrl = this.el.dataset.url;
@@ -48,6 +53,10 @@ export class PhoenixLiveViewDropzone {
       this.dataId = dataset.id;
       this.dataUrl = dataset.url;
       this.app.ports.addUploadUrl.send({id: this.dataId, url: this.dataUrl});
+    }
+
+    if (dataset && this.target !== dataset.target) {
+      this.target = dataset.target;
     }
   }
 }
