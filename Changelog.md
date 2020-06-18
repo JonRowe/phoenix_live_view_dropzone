@@ -1,6 +1,9 @@
 # Development
 
 * Add :phoenix compiler in mix.exs. (Andrew Matheny, #6)
+* Add support for setting a class on the button.
+* Fix `target` option to support changing values.
+  (Matt Bauer, Jon Rowe, #8, #9)
 
 # 0.0.7 (2020-05-22)
 
