@@ -2,6 +2,8 @@
 
 import { Elm } from "./Main.elm";
 
+const eventName = "phx-dropzone";
+
 export class PhoenixLiveViewDropzone {
   mounted() {
     var node = document.createElement("div");
@@ -9,16 +11,19 @@ export class PhoenixLiveViewDropzone {
 
     var liveView = this;
 
-    var generateUrl, statusUpdate;
+    var generateUrl, pushEvent, statusUpdate;
 
-    if (this.el.dataset.target) {
-      var target = this.el.dataset.target;
-      generateUrl = (data) => liveView.pushEventTo(target, "phx-dropzone", ["generate-url", data]);
-      statusUpdate = (data) => liveView.pushEventTo(target, "phx-dropzone", ["file-status", data]);
-    } else {
-      generateUrl = (data) => liveView.pushEvent("phx-dropzone", ["generate-url", data]);
-      statusUpdate = (data) => liveView.pushEvent("phx-dropzone", ["file-status", data]);
+    pushEvent = (event) => {
+      var target = liveView.el.dataset.target;
+      if (target) {
+        liveView.pushEventTo(target, eventName, event)
+      } else {
+        liveView.pushEvent(eventName, event)
+      }
     }
+
+    generateUrl = (data) => pushEvent(["generate-url", data]);
+    statusUpdate = (data) => pushEvent(["file-status", data]);
 
     var flags = {};
 
