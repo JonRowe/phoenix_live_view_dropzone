@@ -1,4 +1,4 @@
-# Development
+# 0.0.8 (2020-06-18)
 
 * Add :phoenix compiler in mix.exs. (Andrew Matheny, #6)
 * Add support for setting a class on the button.
