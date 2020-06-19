@@ -137,7 +137,7 @@ update msg model =
             ( { model | hover = hover }, Cmd.none )
 
         FileSelected file files ->
-            ( model, file :: files |> List.map (createUpload StartUpload) |> Cmd.batch )
+            ( { model | hover = False }, file :: files |> List.map (createUpload StartUpload) |> Cmd.batch )
 
         StartUpload upload ->
             ( setUpload upload, Ports.requestUrl { id = upload.id, name = upload.name } )
