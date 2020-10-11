@@ -19,6 +19,7 @@ type alias Model =
     , buttonText : String
     , fileTypes : List String
     , hover : Bool
+    , multiple : Bool
     , text : String
     , uploads : Uploads
     }
@@ -33,8 +34,10 @@ type alias Config =
 
 type Msg
     = OpenFileSelect
+    | OpenFilesSelect
     | SetHover Bool
-    | FileSelected File (List File)
+    | FileSelected File
+    | FilesSelected File (List File)
     | StartUpload Upload
     | UrlGenerated UploadTarget
     | UploadProgress Upload Progress
@@ -70,11 +73,15 @@ init config =
         fileTypes =
             parseFrom "fileTypes" [] (Json.list Json.string)
 
+        multiple : Bool
+        multiple =
+            parseFrom "multiple" True Json.bool
+
         text : String
         text =
             parseTextFrom "text" ""
     in
-    ( { buttonClass = buttonClass, buttonText = buttonText, fileTypes = fileTypes, hover = False, text = text, uploads = Uploads.empty }, Cmd.none )
+    ( { buttonClass = buttonClass, buttonText = buttonText, fileTypes = fileTypes, hover = False, multiple = multiple, text = text, uploads = Uploads.empty }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -137,12 +144,18 @@ update msg model =
     in
     case msg of
         OpenFileSelect ->
-            ( model, Select.files model.fileTypes FileSelected )
+            ( model, Select.file model.fileTypes FileSelected )
+
+        OpenFilesSelect ->
+            ( model, Select.files model.fileTypes FilesSelected )
 
         SetHover hover ->
             ( { model | hover = hover }, Cmd.none )
 
-        FileSelected file files ->
+        FileSelected file ->
+            ( { model | hover = False }, (createUpload StartUpload file))
+
+        FilesSelected file files ->
             ( { model | hover = False }, file :: files |> List.map (createUpload StartUpload) |> Cmd.batch )
 
         StartUpload upload ->
@@ -176,7 +189,7 @@ view model =
     let
         decodeDrop : Json.Decoder Msg
         decodeDrop =
-            Json.at [ "dataTransfer", "files" ] (Json.oneOrMore FileSelected File.decoder)
+            Json.at [ "dataTransfer", "files" ] (Json.oneOrMore FilesSelected File.decoder)
 
         preventDefault : msg -> ( msg, Bool )
         preventDefault msg =
@@ -185,6 +198,13 @@ view model =
         dragHandler : String -> Json.Decoder msg -> Attribute msg
         dragHandler event decoder =
             preventDefaultOn event (Json.map preventDefault decoder)
+
+        fileSelect : Msg
+        fileSelect =
+            if model.multiple then
+                OpenFilesSelect
+            else
+                OpenFileSelect
     in
     div
         [ if model.hover then
@@ -198,7 +218,7 @@ view model =
         , dragHandler "drop" decodeDrop
         ]
         [ text model.text
-        , button [ class model.buttonClass, onClick OpenFileSelect, type_ "button" ] [ text model.buttonText ]
+        , button [ class model.buttonClass, onClick fileSelect, type_ "button" ] [ text model.buttonText ]
         ]
 
 
