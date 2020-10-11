@@ -63,6 +63,11 @@ defmodule PhoenixLiveViewDropzoneTest do
     assert render([file_types: ~w[application/custom image/png]]) =~ ~r{<div\s*[^>]*data-file-types="application/custom,image/png"[^>]*>\s*</div>}
   end
 
+  test "it allows customising the selection of multiple files" do
+    assert render([multiple: true]) =~ ~r{<div\s*[^>]*data-multiple="true"[^>]*>\s*</div>}
+    assert render([multiple: false]) =~ ~r{<div\s*[^>]*data-multiple="false"[^>]*>\s*</div>}
+  end
+
   test "it allows customising the phx-target with a string" do
     assert render([target: "myself"]) =~ ~r{<div\s*[^>]*data-target="myself"[^>]*>\s*</div>}
   end

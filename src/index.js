@@ -39,6 +39,9 @@ export class PhoenixLiveViewDropzone {
       flags.fileTypes = this.el.dataset.fileTypes.split(",");
     }
 
+    if (this.el.dataset.multiple == "false") { flags.multiple = false }
+    if (this.el.dataset.multiple == "true") { flags.multiple = true }
+
     if (this.el.dataset.text) {
       flags.text = this.el.dataset.text;
     }

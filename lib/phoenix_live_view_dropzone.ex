@@ -76,6 +76,13 @@ defmodule PhoenixLiveViewDropzone do
     """
   end
 
+  defp optional_attributes(%{multiple: value} = assigns) when value in [true, false] do
+    ~L"""
+    data-multiple="<%= value %>"
+    <%= optional_attributes(Map.delete(assigns, :multiple)) %>
+    """
+  end
+
   defp optional_attributes(%{target: target} = assigns) do
     ~L"""
     data-target="<%= target %>"
