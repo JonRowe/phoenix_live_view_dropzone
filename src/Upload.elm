@@ -23,6 +23,7 @@ type alias UploadExport =
     , sent : Int
     , size : Int
     , status : String
+    , body : Maybe String
     }
 
 
@@ -34,6 +35,7 @@ type alias Upload =
     , sent : Int
     , size : Int
     , status : UploadStatus
+    , body : Maybe String
     }
 
 
@@ -76,7 +78,7 @@ export upload =
                 Error ->
                     "Error"
     in
-    { id = upload.id, name = upload.name, progress = upload.progress, sent = upload.sent, size = upload.size, status = status }
+    { id = upload.id, name = upload.name, progress = upload.progress, sent = upload.sent, size = upload.size, status = status, body = upload.body }
 
 
 makeUpload : File -> String -> Upload
@@ -90,7 +92,7 @@ makeUpload file id =
         size =
             File.size file
     in
-    { file = file, id = id, name = name, progress = 0, sent = 0, size = size, status = InProgress }
+    { file = file, id = id, name = name, progress = 0, sent = 0, size = size, status = InProgress, body = Nothing }
 
 
 updateUploadProgress : Upload -> Progress -> Upload

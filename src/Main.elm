@@ -30,6 +30,8 @@ type alias Config =
     , fileTypes : List String
     }
 
+type alias ResponseBody = String
+
 
 type Msg
     = OpenFileSelect
@@ -39,7 +41,7 @@ type Msg
     | UrlGenerated UploadTarget
     | UploadProgress Upload Progress
     | Error UploadId
-    | Done UploadId
+    | Done UploadId ResponseBody
 
 
 init : Value -> ( Model, Cmd Msg )
@@ -94,7 +96,7 @@ startUpload upload url =
         handleResponse result =
             case result of
                 Ok string ->
-                    Done upload.id
+                    Done upload.id string
 
                 _ ->
                     Error upload.id
@@ -113,11 +115,11 @@ startUpload upload url =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     let
-        notifyUploadStatus : UploadId -> UploadStatus -> Cmd Msg
-        notifyUploadStatus id status =
+        notifyUploadStatus : UploadId -> UploadStatus -> Maybe ResponseBody -> Cmd Msg
+        notifyUploadStatus id status body =
             case Uploads.get model.uploads id of
                 Just upload ->
-                    Ports.notifyUploadStatus { upload | status = status }
+                    Ports.notifyUploadStatus { upload | body = body, status = status }
 
                 _ ->
                     Cmd.none
@@ -126,14 +128,14 @@ update msg model =
         setUpload upload =
             { model | uploads = Uploads.update model.uploads upload }
 
-        setUploadStatus : UploadId -> UploadStatus -> ( Model, Cmd Msg )
-        setUploadStatus id status =
+        finishUpload : UploadId -> UploadStatus -> Maybe ResponseBody -> ( Model, Cmd Msg )
+        finishUpload id status maybeBody =
             let
                 newModel : Model
                 newModel =
                     { model | uploads = Uploads.delete model.uploads id }
             in
-            ( newModel, notifyUploadStatus id status )
+            ( newModel, notifyUploadStatus id status maybeBody )
     in
     case msg of
         OpenFileSelect ->
@@ -164,11 +166,11 @@ update msg model =
             in
             ( setUpload updated, Ports.notifyUploadStatus updated )
 
-        Done uploadId ->
-            setUploadStatus uploadId Upload.Done
+        Done uploadId body ->
+            finishUpload uploadId Upload.Done (Just body)
 
         Error uploadId ->
-            setUploadStatus uploadId Upload.Error
+            finishUpload uploadId Upload.Error Nothing
 
 
 view : Model -> Html Msg
