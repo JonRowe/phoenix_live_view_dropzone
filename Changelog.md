@@ -1,3 +1,17 @@
+# 0.0.11 (2020-11-24)
+
+* Add phoenix_live_view 0.15 support.
+* Expose response body from upstream in liveview events.
+
+# 0.0.10 (2020-07-31)
+
+* Reset hover correctly when file selected.
+
+# 0.0.9 (2020-07-11)
+
+* Add phoenix_live_view 0.14 support.
+* Allow customising button css class.
+
 # 0.0.8 (2020-06-18)
 
 * Add :phoenix compiler in mix.exs. (Andrew Matheny, #6)
