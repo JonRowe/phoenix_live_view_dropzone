@@ -4,7 +4,7 @@ import { Elm } from "./Main.elm";
 
 const eventName = "phx-dropzone";
 
-export class PhoenixLiveViewDropzone {
+export const PhoenixLiveViewDropzone = {
   mounted() {
     var node = document.createElement("div");
     this.el.appendChild(node);
@@ -49,7 +49,7 @@ export class PhoenixLiveViewDropzone {
 
     this.dataId = this.el.dataset.id;
     this.dataUrl = this.el.dataset.url;
-  }
+  },
 
   updated() {
     var dataset = this.el.dataset;

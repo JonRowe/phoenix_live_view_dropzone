@@ -1,3 +1,10 @@
+# 0.0.12 (2021-02-01)
+
+*Breaking Changes*
+
+* Hook is now a direct object, not a class, change wiring from
+  `new PhoenixLiveViewDropzone()` to `PhoenixLiveViewDropzone`.
+
 # 0.0.11 (2020-11-24)
 
 * Add phoenix_live_view 0.15 support.
