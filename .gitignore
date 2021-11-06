@@ -33,3 +33,4 @@ mix.lock
 
 # Ignore parcel cache
 .cache
+.parcel-cache

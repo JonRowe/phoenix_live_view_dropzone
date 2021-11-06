@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "description": "A file dropzone compatible with Phoenix LiveView's hooks.",
   "main": "priv/static/dist.js",
+  "source": "src/index.js",
   "dependencies": {},
   "devDependencies": {
+    "@parcel/transformer-elm": "^2.0.0",
     "elm": "^0.19.1-5",
     "elm-format": "^0.8.5",
     "node-elm-compiler": "^5.0.5",
-    "parcel": "^1.12.4"
+    "parcel": "^2.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
