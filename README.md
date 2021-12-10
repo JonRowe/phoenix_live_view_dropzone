@@ -1,3 +1,8 @@
+# THIS PROJECT IS ARCHIVED
+
+LiveView supports file uploads natively, which makes this project a bit irrelevant, code will remain on
+hex for those using it but will not receive updates, please switch to native file uploads.
+
 # Phoenix Live View Dropzone
 
 A file upload solution for Phoenix Live View.
